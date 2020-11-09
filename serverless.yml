@@ -1,0 +1,30 @@
+service: image-resizer
+
+custom:
+  stage: ${opt:stage, 'dev'}
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${self:custom.stage}
+  region: ap-northeast-2
+
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "s3:GetBucketNotification"
+        - "s3:PutBucketNotification"
+        - "s3:GetObject"
+        - "s3:PutObject"
+      Resource: '*'
+
+functions:
+  imageResizer:
+    handler: handler.imageResizer
+    events:
+      - s3:
+          bucket: #bucket name
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: # bucket key path
+
